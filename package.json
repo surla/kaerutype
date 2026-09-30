@@ -1,0 +1,14 @@
+{
+  "name": "kaerutype",
+  "description": "Japanese typing game. See a kana or kanji word, type it in romaji.",
+  "type": "module",
+  "private": true,
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.8.1",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "pnpm@12.8.1"
+}
