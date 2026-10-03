@@ -16,7 +16,9 @@
     "build": "pnpm --filter web build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "pnpm --filter web test",
+    "test:run": "pnpm --filter web test:run"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
