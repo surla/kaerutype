@@ -22,3 +22,25 @@ export function matchBuffer(unit: KanaUnit, buffer: string): BufferMatch {
 
   return 'invalid'
 }
+
+export function typeChar(state: TypingState, char: string): TypingState {
+  const { kanaUnits, index, buffer } = state
+  const currentUnit = kanaUnits[index]
+  if (!currentUnit) return state
+
+  const newBuffer = buffer + char
+  const match = matchBuffer(currentUnit, newBuffer)
+
+  if (match === 'complete') {
+    return {
+      ...state,
+      index: index + 1,
+      buffer: '',
+    }
+  }
+
+  return {
+    ...state,
+    buffer: newBuffer,
+  }
+}
