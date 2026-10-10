@@ -10,3 +10,5 @@ export type TypingState = {
   index: number
   buffer: string
 }
+
+export type BufferMatch = 'complete' | 'partial' | 'invalid'
