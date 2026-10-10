@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createTypingState, matchBuffer, typeChar } from './typing-state'
+import { backspace, createTypingState, matchBuffer, typeChar } from './typing-state'
 import type { KanaUnit } from './types'
 
 describe('createTypingState', () => {
@@ -118,5 +118,35 @@ describe('typeChar', () => {
       expect(final.index).toBe(2)
       expect(final.buffer).toBe('')
     })
+  })
+})
+
+describe('backspace', () => {
+  it('removes the last letter from the buffer', () => {
+    const state = { ...createTypingState('すし'), index: 1, buffer: 'sh' }
+    const result = backspace(state)
+    expect(result.index).toBe(1)
+    expect(result.buffer).toBe('s')
+  })
+
+  it('removes a wrong letter so the player can retry', () => {
+    const state = { ...createTypingState('すし'), buffer: 'ku' }
+    const result = backspace(state)
+    expect(result.index).toBe(0)
+    expect(result.buffer).toBe('k')
+  })
+
+  it('returns the same state when the buffer is empty', () => {
+    const state = { ...createTypingState('すし'), index: 1 }
+    expect(backspace(state)).toBe(state)
+  })
+
+  it('does not undo a completed kana', () => {
+    // typing 'su' completes す, so the buffer is empty and index is 1
+    const state = { ...createTypingState('すし'), buffer: 's' }
+    const afterSu = typeChar(state, 'u')
+    const result = backspace(afterSu)
+    expect(result.index).toBe(1)
+    expect(result.buffer).toBe('')
   })
 })

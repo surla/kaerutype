@@ -44,3 +44,12 @@ export function typeChar(state: TypingState, char: string): TypingState {
     buffer: newBuffer,
   }
 }
+
+export function backspace(state: TypingState): TypingState {
+  if (!state.buffer) return state
+
+  return {
+    ...state,
+    buffer: state.buffer.slice(0, -1),
+  }
+}
