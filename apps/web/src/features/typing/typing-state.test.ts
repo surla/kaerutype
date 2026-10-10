@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { backspace, createTypingState, matchBuffer, typeChar } from './typing-state'
-import type { KanaUnit } from './types'
+import { backspace, createTypingState, isWordComplete, matchBuffer, typeChar } from './typing-state'
+import type { KanaUnit, TypingState } from './types'
 
 describe('createTypingState', () => {
   it('initializes with an empty buffer', () => {
@@ -148,5 +148,21 @@ describe('backspace', () => {
     const result = backspace(afterSu)
     expect(result.index).toBe(1)
     expect(result.buffer).toBe('')
+  })
+})
+
+describe('isWordComplete', () => {
+  it('returns true when all kana are completed', () => {
+    const state = { ...createTypingState('すし'), index: 2 }
+    expect(isWordComplete(state)).toBe(true)
+  })
+
+  it('returns false when not all kana are completed', () => {
+    const state = { ...createTypingState('すし'), index: 1 }
+    expect(isWordComplete(state)).toBe(false)
+  })
+
+  it('is false at the start of a word', () => {
+    expect(isWordComplete(createTypingState('すし'))).toBe(false)
   })
 })

@@ -53,3 +53,7 @@ export function backspace(state: TypingState): TypingState {
     buffer: state.buffer.slice(0, -1),
   }
 }
+
+export function isWordComplete(state: TypingState): boolean {
+  return state.index === state.kanaUnits.length
+}
