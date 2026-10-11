@@ -78,10 +78,10 @@ describe('tokenizeKana: ん', () => {
     expect(inputs('こんや')[1]).toEqual(['nn'])
   })
 
-  it('accepts n or nn before an n sound', () => {
-    expect(inputs('かんな')[1]).toEqual(['n', 'nn'])
-    expect(inputs('こんにちは')[1]).toEqual(['n', 'nn'])
-    expect(inputs('みんな')[1]).toEqual(['n', 'nn'])
+  it('requires nn before an n sound', () => {
+    expect(inputs('かんな')[1]).toEqual(['nn'])
+    expect(inputs('こんにちは')[1]).toEqual(['nn'])
+    expect(inputs('みんな')[1]).toEqual(['nn'])
   })
 
   it('does not change the table default', () => {

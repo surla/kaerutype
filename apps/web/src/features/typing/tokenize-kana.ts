@@ -27,13 +27,22 @@ function buildDoubledInputs(nextKana: string): string[] {
   const consonants = 'bcdfghjkmprstvwyz'
   const doubled: string[] = []
 
-  for (const spelling of kanaTable[nextKana]) {
-    if (consonants.includes(spelling[0])) {
-      doubled.push(spelling[0] + spelling)
+  for (const acceptedInput of kanaTable[nextKana]) {
+    if (consonants.includes(acceptedInput[0])) {
+      doubled.push(acceptedInput[0] + acceptedInput)
     }
   }
 
   return doubled
+}
+
+function requireDoubleN(nextKana: string | undefined): boolean {
+  const doubleNInitials = 'aiueoyn'
+
+  return (
+    !nextKana ||
+    kanaTable[nextKana].some((acceptedInput) => doubleNInitials.includes(acceptedInput[0]))
+  )
 }
 
 export function tokenizeKana(word: string): KanaUnit[] {
@@ -44,16 +53,20 @@ export function tokenizeKana(word: string): KanaUnit[] {
     const kana = kanaList[i]
     const nextKana = kanaList[i + 1]
 
-    const doubledInputs = kana === 'っ' && nextKana ? buildDoubledInputs(nextKana) : []
-
     if (kana === 'ん') {
-      const requiresDoubleN =
-        !nextKana || kanaTable[nextKana].some((spelling) => 'aiueoy'.includes(spelling[0]))
+      kanaUnits.push({
+        kana,
+        acceptedInputs: requireDoubleN(nextKana) ? ['nn'] : [...kanaTable[kana]],
+      })
+    } else if (kana === 'っ' && nextKana) {
+      const doubledInputs = buildDoubledInputs(nextKana)
 
-      kanaUnits.push({ kana, acceptedInputs: requiresDoubleN ? ['nn'] : [...kanaTable[kana]] })
-    } else if (doubledInputs.length > 0) {
-      kanaUnits.push({ kana: kana + nextKana, acceptedInputs: doubledInputs })
-      i++
+      if (doubledInputs.length > 0) {
+        kanaUnits.push({ kana: kana + nextKana, acceptedInputs: doubledInputs })
+        i++
+      } else {
+        kanaUnits.push({ kana, acceptedInputs: [...kanaTable[kana]] })
+      }
     } else {
       kanaUnits.push({ kana, acceptedInputs: [...kanaTable[kana]] })
     }
