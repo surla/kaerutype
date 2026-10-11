@@ -217,8 +217,7 @@ describe('context-dependent kana', () => {
       expect(isWordComplete(typeString('かんじ', 'kanji'))).toBe(true)
     })
 
-    // TODO: Fix incorrect n and nn handling for ん (#6)
-    it.skip('accepts nn before consonants', () => {
+    it('accepts nn before consonants', () => {
       expect(isWordComplete(typeString('かんじ', 'kannji'))).toBe(true)
     })
 
@@ -238,8 +237,7 @@ describe('context-dependent kana', () => {
       expect(isWordComplete(typeString('こにゃ', 'konnya'))).toBe(false)
     })
 
-    // TODO: Fix incorrect n and nn handling for ん (#6)
-    it.skip('requires nn before a kana that starts with n (こんにちは)', () => {
+    it('requires nn before a kana that starts with n (こんにちは)', () => {
       expect(isWordComplete(typeString('こんにちは', 'konnnichiha'))).toBe(true)
       expect(isWordComplete(typeString('こんにちは', 'konnichiha'))).toBe(false)
     })

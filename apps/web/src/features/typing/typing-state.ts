@@ -31,7 +31,19 @@ export function typeChar(state: TypingState, char: string): TypingState {
   const newBuffer = buffer + char
   const match = matchBuffer(currentUnit, newBuffer)
 
-  if (match === 'complete') {
+  if (buffer && match === 'invalid' && matchBuffer(currentUnit, buffer) === 'complete') {
+    return {
+      ...state,
+      index: index + 1,
+      buffer: char,
+    }
+  }
+
+  const hasLongerSpelling = currentUnit.acceptedInputs.some(
+    (input) => input.length > newBuffer.length && input.startsWith(newBuffer),
+  )
+
+  if (match === 'complete' && !hasLongerSpelling) {
     return {
       ...state,
       index: index + 1,
