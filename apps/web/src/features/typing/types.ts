@@ -4,3 +4,11 @@ export type KanaUnit = {
 }
 
 export type KanaTable = Record<string, string[]>
+
+export type TypingState = {
+  kanaUnits: KanaUnit[]
+  index: number
+  buffer: string
+}
+
+export type BufferMatch = 'complete' | 'partial' | 'invalid'
