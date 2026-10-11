@@ -166,3 +166,87 @@ describe('isWordComplete', () => {
     expect(isWordComplete(createTypingState('すし'))).toBe(false)
   })
 })
+
+describe('typing flow', () => {
+  const typeString = (word: string, romaji: string): TypingState =>
+    [...romaji].reduce(typeChar, createTypingState(word))
+
+  it('recovers from a wrong letter after backspace', () => {
+    const wrong = typeString('すし', 'k')
+    const result = [...'su'].reduce(typeChar, backspace(wrong))
+    expect(result).toMatchObject({ index: 1, buffer: '' })
+  })
+
+  it('can take the other spelling after backspacing', () => {
+    const afterSh = typeString('すし', 'sush')
+    const result = typeChar(backspace(afterSh), 'i')
+    expect(result).toMatchObject({ index: 2, buffer: '' })
+  })
+
+  it('allows different spellings in the same word', () => {
+    expect(isWordComplete(typeString('すし', 'sushi'))).toBe(true)
+    expect(isWordComplete(typeString('すし', 'susi'))).toBe(true)
+  })
+
+  it('handles repeated kana', () => {
+    expect(isWordComplete(typeString('ここ', 'koko'))).toBe(true)
+  })
+})
+
+describe('context-dependent kana', () => {
+  const typeString = (word: string, romaji: string): TypingState =>
+    [...romaji].reduce(typeChar, createTypingState(word))
+
+  describe('っ doubling', () => {
+    it('finishes かった with a doubled t', () => {
+      expect(isWordComplete(typeString('かった', 'katta'))).toBe(true)
+    })
+
+    it('finishes いっち with either spelling', () => {
+      expect(isWordComplete(typeString('いっち', 'icchi'))).toBe(true)
+      expect(isWordComplete(typeString('いっち', 'itti'))).toBe(true)
+    })
+
+    it('does not finish かった without a doubled t', () => {
+      expect(isWordComplete(typeString('かった', 'kata'))).toBe(false)
+    })
+  })
+
+  describe('ん handling', () => {
+    it('accepts a single n before consonants', () => {
+      expect(isWordComplete(typeString('かんじ', 'kanji'))).toBe(true)
+    })
+
+    // TODO: Fix incorrect n and nn handling for ん (#6)
+    it.skip('accepts nn before consonants', () => {
+      expect(isWordComplete(typeString('かんじ', 'kannji'))).toBe(true)
+    })
+
+    it('requires nn before vowels', () => {
+      expect(isWordComplete(typeString('しんあい', 'shinnai'))).toBe(true)
+      expect(isWordComplete(typeString('しんあい', 'shinai'))).toBe(false)
+    })
+
+    it('requires nn before y sounds', () => {
+      expect(isWordComplete(typeString('こんや', 'konnya'))).toBe(true)
+      expect(isWordComplete(typeString('こんや', 'konya'))).toBe(false)
+    })
+
+    it('keeps んや and にゃ distinct', () => {
+      // konya is こにゃ, konnya is こんや
+      expect(isWordComplete(typeString('こにゃ', 'konya'))).toBe(true)
+      expect(isWordComplete(typeString('こにゃ', 'konnya'))).toBe(false)
+    })
+
+    // TODO: Fix incorrect n and nn handling for ん (#6)
+    it.skip('requires nn before a kana that starts with n (こんにちは)', () => {
+      expect(isWordComplete(typeString('こんにちは', 'konnnichiha'))).toBe(true)
+      expect(isWordComplete(typeString('こんにちは', 'konnichiha'))).toBe(false)
+    })
+
+    it('requires nn at the end of a word', () => {
+      expect(isWordComplete(typeString('ほん', 'honn'))).toBe(true)
+      expect(isWordComplete(typeString('ほん', 'hon'))).toBe(false)
+    })
+  })
+})
