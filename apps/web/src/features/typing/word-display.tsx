@@ -1,3 +1,4 @@
+import { isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
 
 type WordDisplayProps = {
@@ -9,9 +10,11 @@ export function WordDisplay({ text }: WordDisplayProps) {
 
   if (!wordState) return null
 
+  const isComplete = isWordComplete(wordState)
+
   return (
     <div className="text-center">
-      <p className="text-5xl">{text}</p>
+      <p className={`text-5xl ${isComplete ? 'text-green-500' : 'text-neutral-700'}`}>{text}</p>
       <p className="text-xl">
         {wordState.kanaUnits.map((unit, index) => {
           return (
