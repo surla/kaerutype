@@ -149,6 +149,16 @@ describe('backspace', () => {
     expect(result.index).toBe(1)
     expect(result.buffer).toBe('')
   })
+
+  it('should ignore characters after the word is complete', () => {
+    let state = createTypingState('かんじ')
+    for (const char of 'kanji') {
+      state = typeChar(state, char)
+    }
+
+    expect(isWordComplete(state)).toBe(true)
+    expect(typeChar(state, 'k')).toEqual(state)
+  })
 })
 
 describe('isWordComplete', () => {
