@@ -12,3 +12,10 @@ export type TypingState = {
 }
 
 export type BufferMatch = 'complete' | 'partial' | 'invalid'
+
+export type Word = {
+  id: string
+  word: string
+  reading: string
+  meaning: string
+}
