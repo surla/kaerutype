@@ -1,14 +1,22 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import type { Word } from './types'
 import { createTypingState, isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
 
 const WORD = 'こんにちは'
 const WORD_ROMAJI = 'konnnichiha'
 
+const makeWord = (reading: string): Word => ({
+  id: reading,
+  word: reading,
+  reading,
+  meaning: reading,
+})
+
 describe('useTypingStore', () => {
   beforeEach(() => {
-    useTypingStore.setState({ wordState: null })
+    useTypingStore.setState({ queue: { words: [makeWord(WORD)], index: 0 }, wordState: null })
   })
 
   it('should initialize with null wordState', () => {
@@ -17,17 +25,17 @@ describe('useTypingStore', () => {
   })
 
   it('should set wordState when start is called', () => {
-    useTypingStore.getState().start(WORD)
+    useTypingStore.getState().start()
     expect(useTypingStore.getState().wordState).not.toBeNull()
   })
 
   it('should replace current word when start is called again', () => {
-    useTypingStore.getState().start(WORD)
+    useTypingStore.getState().start()
     useTypingStore.getState().type('k')
 
-    useTypingStore.getState().start('かんじ')
+    useTypingStore.getState().start()
+    const newWordState = createTypingState(WORD)
 
-    const newWordState = createTypingState('かんじ')
     expect(useTypingStore.getState().wordState).toEqual(newWordState)
   })
 
@@ -42,7 +50,7 @@ describe('useTypingStore', () => {
   })
 
   it('should complete the word when all characters are typed correctly', () => {
-    useTypingStore.getState().start(WORD)
+    useTypingStore.getState().start()
     for (const char of WORD_ROMAJI) {
       useTypingStore.getState().type(char)
     }
@@ -53,7 +61,7 @@ describe('useTypingStore', () => {
   })
 
   it('should not complete the word when a wrong character is typed', () => {
-    useTypingStore.getState().start(WORD)
+    useTypingStore.getState().start()
     for (const char of 'konnichiwa') {
       useTypingStore.getState().type(char)
     }
@@ -64,7 +72,7 @@ describe('useTypingStore', () => {
   })
 
   it('should restore the previous state when backspace is pressed after a wrong character', () => {
-    useTypingStore.getState().start(WORD)
+    useTypingStore.getState().start()
 
     const initialState = useTypingStore.getState().wordState
 
