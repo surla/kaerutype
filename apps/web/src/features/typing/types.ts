@@ -19,3 +19,8 @@ export type Word = {
   reading: string
   meaning: string
 }
+
+export type WordQueue = {
+  words: Word[]
+  index: number
+}
