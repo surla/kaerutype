@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { Word } from './types'
-import { createWordQueue, getCurrentWord } from './word-queue'
+import { advanceQueue, createWordQueue, getCurrentWord } from './word-queue'
 
 const words: Word[] = [
   { id: '1', word: '学校', reading: 'がっこう', meaning: 'school' },
@@ -50,5 +50,47 @@ describe('getCurrentWord', () => {
     const queue = createWordQueue(words)
 
     expect(getCurrentWord(queue)).toBeNull()
+  })
+})
+
+describe('advanceQueue', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('advances the index when there are more words', () => {
+    const queue = createWordQueue(words)
+
+    const newQueue = advanceQueue(queue)
+
+    expect(newQueue.index).toBe(queue.index + 1)
+  })
+
+  it('resets the index to 0 when reaching the end of the queue', () => {
+    const queue = createWordQueue(words)
+    queue.index = words.length - 1 // Set to last index
+
+    const newQueue = advanceQueue(queue)
+
+    expect(newQueue.index).toBe(0)
+  })
+
+  it('shuffles the words when reaching the end of the queue', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0) // Mock random to control shuffle
+
+    const next = advanceQueue({ words, index: 1 })
+
+    expect(next).toEqual({ words, index: 0 })
+  })
+
+  it('handles an empty queue', () => {
+    const words: Word[] = []
+
+    const queue = createWordQueue(words)
+
+    const newQueue = advanceQueue(queue)
+
+    expect(newQueue.index).toBe(0)
+    expect(newQueue.words).toHaveLength(0)
   })
 })
