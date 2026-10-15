@@ -1,0 +1,52 @@
+[
+  { "id": "1", "word": "学校", "reading": "がっこう", "meaning": "school" },
+  { "id": "2", "word": "切符", "reading": "きっぷ", "meaning": "ticket" },
+  { "id": "3", "word": "雑誌", "reading": "ざっし", "meaning": "magazine" },
+  {
+    "id": "4",
+    "word": "抹茶",
+    "reading": "まっちゃ",
+    "meaning": "matcha, powdered green tea"
+  },
+  {
+    "id": "5",
+    "word": "漢字",
+    "reading": "かんじ",
+    "meaning": "kanji, Chinese characters"
+  },
+  { "id": "6", "word": "本", "reading": "ほん", "meaning": "book" },
+  { "id": "7", "word": "みんな", "reading": "みんな", "meaning": "everyone" },
+  {
+    "id": "8",
+    "word": "こんにちは",
+    "reading": "こんにちは",
+    "meaning": "hello, good afternoon"
+  },
+  { "id": "9", "word": "先生", "reading": "せんせい", "meaning": "teacher" },
+  { "id": "10", "word": "電話", "reading": "でんわ", "meaning": "telephone" },
+  {
+    "id": "11",
+    "word": "恋愛",
+    "reading": "れんあい",
+    "meaning": "romance, love"
+  },
+  { "id": "12", "word": "東京", "reading": "とうきょう", "meaning": "Tokyo" },
+  { "id": "13", "word": "大きい", "reading": "おおきい", "meaning": "big" },
+  { "id": "14", "word": "旅行", "reading": "りょこう", "meaning": "travel, trip" },
+  { "id": "15", "word": "写真", "reading": "しゃしん", "meaning": "photograph" },
+  { "id": "16", "word": "お茶", "reading": "おちゃ", "meaning": "tea" },
+  { "id": "17", "word": "寿司", "reading": "すし", "meaning": "sushi" },
+  { "id": "18", "word": "机", "reading": "つくえ", "meaning": "desk" },
+  {
+    "id": "19",
+    "word": "富士山",
+    "reading": "ふじさん",
+    "meaning": "Mount Fuji"
+  },
+  {
+    "id": "20",
+    "word": "じゃがいも",
+    "reading": "じゃがいも",
+    "meaning": "potato"
+  }
+]
