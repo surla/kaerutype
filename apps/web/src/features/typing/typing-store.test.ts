@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import type { Word } from './types'
+import { createTypingSession } from './typing-session'
 import { createTypingState, isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
 
@@ -16,7 +17,11 @@ const makeWord = (reading: string): Word => ({
 
 describe('useTypingStore', () => {
   beforeEach(() => {
-    useTypingStore.setState({ queue: { words: [makeWord(WORD)], index: 0 }, wordState: null })
+    useTypingStore.setState({
+      queue: { words: [makeWord(WORD)], index: 0 },
+      wordState: null,
+      session: createTypingSession(),
+    })
   })
 
   it('should initialize with null wordState', () => {
@@ -81,5 +86,55 @@ describe('useTypingStore', () => {
 
     useTypingStore.getState().backspace()
     expect(useTypingStore.getState().wordState).toEqual(initialState)
+  })
+
+  it('initializes with an idle session', () => {
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('starts a session', () => {
+    useTypingStore.getState().startSession(1000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('does not restart an in-progress session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().startSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('finishes an in-progress session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().finishSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'finished',
+      startedAt: 1000,
+      endedAt: 2000,
+    })
+  })
+
+  it('does not finish an idle session', () => {
+    useTypingStore.getState().finishSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('resets the session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().finishSession(2000)
+    useTypingStore.getState().resetSession()
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
   })
 })
