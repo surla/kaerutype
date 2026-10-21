@@ -137,4 +137,36 @@ describe('useTypingStore', () => {
 
     expect(useTypingStore.getState().session).toEqual(createTypingSession())
   })
+
+  it('starts the session on the first keystroke', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('does not start the session when a key is typed before', () => {
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('keeps the original start time on later keystrokes', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().type('o', 2000)
+
+    expect(useTypingStore.getState().session.startedAt).toBe(1000)
+  })
+
+  it('starts the session on a wrong first keystroke', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('o', 1000)
+
+    expect(useTypingStore.getState().session.startedAt).toBe(1000)
+  })
 })

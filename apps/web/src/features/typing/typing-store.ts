@@ -18,12 +18,12 @@ type TypingStore = {
 
   start: () => void
   nextWord: () => void
-  type: (char: string) => void
+  type: (char: string, now: number) => void
   backspace: () => void
 
   startSession: (now: number) => void
   finishSession: (now: number) => void
-  resetSession: (now: number) => void
+  resetSession: () => void
 }
 
 export const useTypingStore = create<TypingStore>()((set) => ({
@@ -39,6 +39,7 @@ export const useTypingStore = create<TypingStore>()((set) => ({
         wordState: currentWord ? createTypingState(currentWord.reading) : null,
       }
     }),
+
   nextWord: () =>
     set((state) => {
       const queue = advanceQueue(state.queue)
@@ -49,10 +50,17 @@ export const useTypingStore = create<TypingStore>()((set) => ({
         wordState: currentWord ? createTypingState(currentWord.reading) : null,
       }
     }),
-  type: (char) =>
-    set((state) => ({
-      wordState: state.wordState ? typeChar(state.wordState, char) : null,
-    })),
+
+  type: (char, now) =>
+    set((state) => {
+      if (!state.wordState) return state
+
+      return {
+        wordState: typeChar(state.wordState, char),
+        session: startTypingSession(state.session, now),
+      }
+    }),
+
   backspace: () =>
     set((state) => ({
       wordState: state.wordState ? backspace(state.wordState) : null,
