@@ -15,7 +15,7 @@ export function useTypingInput() {
         backspace()
       } else if (event.key.length === 1) {
         event.preventDefault()
-        type(event.key.toLowerCase())
+        type(event.key.toLowerCase(), Date.now())
       }
     }
 

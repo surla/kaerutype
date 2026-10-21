@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import type { Word } from './types'
+import { createTypingSession } from './typing-session'
 import { createTypingState, isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
 
@@ -16,7 +17,11 @@ const makeWord = (reading: string): Word => ({
 
 describe('useTypingStore', () => {
   beforeEach(() => {
-    useTypingStore.setState({ queue: { words: [makeWord(WORD)], index: 0 }, wordState: null })
+    useTypingStore.setState({
+      queue: { words: [makeWord(WORD)], index: 0 },
+      wordState: null,
+      session: createTypingSession(),
+    })
   })
 
   it('should initialize with null wordState', () => {
@@ -31,7 +36,7 @@ describe('useTypingStore', () => {
 
   it('should replace current word when start is called again', () => {
     useTypingStore.getState().start()
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
 
     useTypingStore.getState().start()
     const newWordState = createTypingState(WORD)
@@ -40,7 +45,7 @@ describe('useTypingStore', () => {
   })
 
   it('should do nothing when type is called before start', () => {
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
     expect(useTypingStore.getState().wordState).toBeNull()
   })
 
@@ -52,7 +57,7 @@ describe('useTypingStore', () => {
   it('should complete the word when all characters are typed correctly', () => {
     useTypingStore.getState().start()
     for (const char of WORD_ROMAJI) {
-      useTypingStore.getState().type(char)
+      useTypingStore.getState().type(char, 1000)
     }
 
     const { wordState } = useTypingStore.getState()
@@ -63,7 +68,7 @@ describe('useTypingStore', () => {
   it('should not complete the word when a wrong character is typed', () => {
     useTypingStore.getState().start()
     for (const char of 'konnichiwa') {
-      useTypingStore.getState().type(char)
+      useTypingStore.getState().type(char, 1000)
     }
 
     const { wordState } = useTypingStore.getState()
@@ -76,10 +81,155 @@ describe('useTypingStore', () => {
 
     const initialState = useTypingStore.getState().wordState
 
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
     expect(useTypingStore.getState().wordState).not.toEqual(initialState)
 
     useTypingStore.getState().backspace()
     expect(useTypingStore.getState().wordState).toEqual(initialState)
+  })
+
+  it('initializes with an idle session', () => {
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('starts a session', () => {
+    useTypingStore.getState().startSession(1000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('does not restart an in-progress session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().startSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('finishes an in-progress session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().finishSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'finished',
+      startedAt: 1000,
+      endedAt: 2000,
+    })
+  })
+
+  it('does not finish an idle session', () => {
+    useTypingStore.getState().finishSession(2000)
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('resets the session', () => {
+    useTypingStore.getState().startSession(1000)
+    useTypingStore.getState().finishSession(2000)
+    useTypingStore.getState().resetSession()
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('starts the session on the first keystroke', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    })
+  })
+
+  it('does not start the session when a key is typed before', () => {
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('keeps the original start time on later keystrokes', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().type('o', 2000)
+
+    expect(useTypingStore.getState().session.startedAt).toBe(1000)
+  })
+
+  it('starts the session on a wrong first keystroke', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('o', 1000)
+
+    expect(useTypingStore.getState().session.startedAt).toBe(1000)
+  })
+
+  it('ignores typing after a session is finished', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    const before = useTypingStore.getState().wordState
+
+    useTypingStore.getState().type('o', 3000)
+
+    expect(useTypingStore.getState().wordState).toBe(before)
+  })
+
+  it('ignores backspace after a session is finished', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    const before = useTypingStore.getState().wordState
+
+    useTypingStore.getState().backspace()
+
+    expect(useTypingStore.getState().wordState).toBe(before)
+  })
+
+  it('resets the session on restart', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    useTypingStore.getState().restart()
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('goes back to the first word on restart', () => {
+    useTypingStore.setState({
+      queue: { words: [makeWord('あい'), makeWord('うえ'), makeWord('おか')], index: 2 },
+    })
+
+    useTypingStore.getState().start()
+    useTypingStore.getState().restart()
+
+    const { queue, wordState } = useTypingStore.getState()
+
+    expect(queue.index).toBe(0)
+    expect(wordState).toEqual(createTypingState(queue.words[0].reading))
+  })
+
+  it('accepts typing again after restart', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    useTypingStore.getState().restart()
+    useTypingStore.getState().type('k', 4000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 4000,
+      endedAt: null,
+    })
   })
 })

@@ -24,3 +24,9 @@ export type WordQueue = {
   words: Word[]
   index: number
 }
+
+export type TypingSession = {
+  status: 'idle' | 'in-progress' | 'finished'
+  startedAt: number | null
+  endedAt: number | null
+}
