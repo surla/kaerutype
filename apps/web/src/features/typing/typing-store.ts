@@ -24,6 +24,8 @@ type TypingStore = {
   startSession: (now: number) => void
   finishSession: (now: number) => void
   resetSession: () => void
+
+  restart: () => void
 }
 
 export const useTypingStore = create<TypingStore>()((set) => ({
@@ -83,4 +85,16 @@ export const useTypingStore = create<TypingStore>()((set) => ({
     })),
 
   resetSession: () => set({ session: resetTypingSession() }),
+
+  restart: () =>
+    set((state) => {
+      const queue = createWordQueue(state.queue.words)
+      const currentWord = getCurrentWord(queue)
+
+      return {
+        queue,
+        wordState: currentWord ? createTypingState(currentWord.reading) : null,
+        session: resetTypingSession(),
+      }
+    }),
 }))

@@ -4,7 +4,6 @@ import type { Word } from './types'
 import { createTypingSession } from './typing-session'
 import { createTypingState, isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
-import { use } from 'react'
 
 const WORD = 'こんにちは'
 const WORD_ROMAJI = 'konnnichiha'
@@ -193,5 +192,42 @@ describe('useTypingStore', () => {
     useTypingStore.getState().backspace()
 
     expect(useTypingStore.getState().wordState).toBe(before)
+  })
+
+  it('resets the session on restart', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    useTypingStore.getState().restart()
+
+    expect(useTypingStore.getState().session).toEqual(createTypingSession())
+  })
+
+  it('goes back to the first word on restart', () => {
+    useTypingStore.setState({
+      queue: { words: [makeWord('あい'), makeWord('うえ'), makeWord('おか')], index: 2 },
+    })
+
+    useTypingStore.getState().start()
+
+    useTypingStore.getState().restart()
+
+    expect(useTypingStore.getState().queue.index).toEqual(0)
+  })
+
+  it('accepts typing again after restart', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    useTypingStore.getState().restart()
+    useTypingStore.getState().type('k', 4000)
+
+    expect(useTypingStore.getState().session).toEqual({
+      status: 'in-progress',
+      startedAt: 4000,
+      endedAt: null,
+    })
   })
 })
