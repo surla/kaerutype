@@ -210,10 +210,12 @@ describe('useTypingStore', () => {
     })
 
     useTypingStore.getState().start()
-
     useTypingStore.getState().restart()
 
-    expect(useTypingStore.getState().queue.index).toEqual(0)
+    const { queue, wordState } = useTypingStore.getState()
+
+    expect(queue.index).toBe(0)
+    expect(wordState).toEqual(createTypingState(queue.words[0].reading))
   })
 
   it('accepts typing again after restart', () => {
