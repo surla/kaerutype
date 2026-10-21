@@ -36,7 +36,7 @@ describe('useTypingStore', () => {
 
   it('should replace current word when start is called again', () => {
     useTypingStore.getState().start()
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
 
     useTypingStore.getState().start()
     const newWordState = createTypingState(WORD)
@@ -45,7 +45,7 @@ describe('useTypingStore', () => {
   })
 
   it('should do nothing when type is called before start', () => {
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
     expect(useTypingStore.getState().wordState).toBeNull()
   })
 
@@ -57,7 +57,7 @@ describe('useTypingStore', () => {
   it('should complete the word when all characters are typed correctly', () => {
     useTypingStore.getState().start()
     for (const char of WORD_ROMAJI) {
-      useTypingStore.getState().type(char)
+      useTypingStore.getState().type(char, 1000)
     }
 
     const { wordState } = useTypingStore.getState()
@@ -68,7 +68,7 @@ describe('useTypingStore', () => {
   it('should not complete the word when a wrong character is typed', () => {
     useTypingStore.getState().start()
     for (const char of 'konnichiwa') {
-      useTypingStore.getState().type(char)
+      useTypingStore.getState().type(char, 1000)
     }
 
     const { wordState } = useTypingStore.getState()
@@ -81,7 +81,7 @@ describe('useTypingStore', () => {
 
     const initialState = useTypingStore.getState().wordState
 
-    useTypingStore.getState().type('k')
+    useTypingStore.getState().type('k', 1000)
     expect(useTypingStore.getState().wordState).not.toEqual(initialState)
 
     useTypingStore.getState().backspace()
