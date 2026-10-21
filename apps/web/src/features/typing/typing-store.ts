@@ -54,6 +54,7 @@ export const useTypingStore = create<TypingStore>()((set) => ({
   type: (char, now) =>
     set((state) => {
       if (!state.wordState) return state
+      if (state.session.status === 'finished') return state
 
       return {
         wordState: typeChar(state.wordState, char),
@@ -62,9 +63,14 @@ export const useTypingStore = create<TypingStore>()((set) => ({
     }),
 
   backspace: () =>
-    set((state) => ({
-      wordState: state.wordState ? backspace(state.wordState) : null,
-    })),
+    set((state) => {
+      if (!state.wordState) return state
+      if (state.session.status === 'finished') return state
+
+      return {
+        wordState: backspace(state.wordState),
+      }
+    }),
 
   startSession: (now) =>
     set((state) => ({

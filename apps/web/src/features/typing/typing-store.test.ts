@@ -4,6 +4,7 @@ import type { Word } from './types'
 import { createTypingSession } from './typing-session'
 import { createTypingState, isWordComplete } from './typing-state'
 import { useTypingStore } from './typing-store'
+import { use } from 'react'
 
 const WORD = 'こんにちは'
 const WORD_ROMAJI = 'konnnichiha'
@@ -168,5 +169,29 @@ describe('useTypingStore', () => {
     useTypingStore.getState().type('o', 1000)
 
     expect(useTypingStore.getState().session.startedAt).toBe(1000)
+  })
+
+  it('ignores typing after a session is finished', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    const before = useTypingStore.getState().wordState
+
+    useTypingStore.getState().type('o', 3000)
+
+    expect(useTypingStore.getState().wordState).toBe(before)
+  })
+
+  it('ignores backspace after a session is finished', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+
+    const before = useTypingStore.getState().wordState
+
+    useTypingStore.getState().backspace()
+
+    expect(useTypingStore.getState().wordState).toBe(before)
   })
 })
