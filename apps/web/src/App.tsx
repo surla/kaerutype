@@ -6,6 +6,8 @@ import { useTypingStore } from './features/typing/typing-store'
 import { WordDisplay } from './features/typing/word-display'
 import { getCurrentWord } from './features/typing/word-queue'
 
+import { Timer } from './features/typing/Timer'
+
 const FLASH_MS = 225
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">
       <h1 className="text-center text-3xl font-bold">kaerutype</h1>
+      <Timer />
       <WordDisplay text={currentWord?.word ?? ''} />
       <TypingField />
     </main>
