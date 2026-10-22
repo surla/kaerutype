@@ -4,6 +4,7 @@ import type { TypingSession } from './types'
 import {
   createTypingSession,
   finishTypingSession,
+  getRemainingSeconds,
   resetTypingSession,
   startTypingSession,
 } from './typing-session'
@@ -115,5 +116,39 @@ describe('resetTypingSession', () => {
 
   it('returns a new object each time', () => {
     expect(resetTypingSession()).not.toBe(resetTypingSession())
+  })
+})
+
+describe('getRemainingSeconds', () => {
+  it('returns the full duration for an idle session', () => {
+    expect(getRemainingSeconds(createTypingSession(), 5000, 30)).toBe(30)
+  })
+
+  it('return the time left for an in-progess session', () => {
+    const started = startTypingSession(createTypingSession(), 1000)
+
+    expect(getRemainingSeconds(started, 11000, 30)).toBe(20)
+  })
+
+  it('returns zero once the time is up', () => {
+    const started = startTypingSession(createTypingSession(), 1000)
+
+    expect(getRemainingSeconds(started, 51000, 30)).toBe(0)
+  })
+
+  it('returns zero exactnly at the end', () => {
+    const started = startTypingSession(createTypingSession(), 1000)
+
+    expect(getRemainingSeconds(started, 31000, 30)).toBe(0)
+  })
+
+  it('returns zero for a finished session', () => {
+    const finished: TypingSession = {
+      status: 'finished',
+      startedAt: 1000,
+      endedAt: 2000,
+    }
+
+    expect(getRemainingSeconds(finished, 5000, 30)).toBe(0)
   })
 })

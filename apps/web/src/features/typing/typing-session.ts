@@ -1,5 +1,7 @@
 import type { TypingSession } from './types'
 
+export const DEFAULT_SESSION_DURATION_SECONDS = 30
+
 export function createTypingSession(): TypingSession {
   return {
     status: 'idle',
@@ -30,4 +32,17 @@ export function finishTypingSession(session: TypingSession, now: number): Typing
 
 export function resetTypingSession(): TypingSession {
   return createTypingSession()
+}
+
+export function getRemainingSeconds(
+  session: TypingSession,
+  now: number,
+  durationSeconds: number,
+): number {
+  if (session.status === 'finished') return 0
+  if (session.startedAt === null) return durationSeconds
+
+  const elapsedSeconds = (now - session.startedAt) / 1000
+
+  return Math.max(0, durationSeconds - elapsedSeconds)
 }
