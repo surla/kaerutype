@@ -46,3 +46,11 @@ export function getRemainingSeconds(
 
   return Math.max(0, durationSeconds - elapsedSeconds)
 }
+
+export function getElapsedMinutes(session: TypingSession): number {
+  const { startedAt, endedAt } = session
+
+  if (startedAt === null || endedAt === null) return 0
+
+  return Math.max(0, (endedAt - startedAt) / 60000)
+}

@@ -4,6 +4,7 @@ import type { TypingSession } from './types'
 import {
   createTypingSession,
   finishTypingSession,
+  getElapsedMinutes,
   getRemainingSeconds,
   resetTypingSession,
   startTypingSession,
@@ -150,5 +151,53 @@ describe('getRemainingSeconds', () => {
     }
 
     expect(getRemainingSeconds(finished, 5000, 30)).toBe(0)
+  })
+})
+
+describe('getElapsedMinutes', () => {
+  it('returns the elapsed time in minutes', () => {
+    const session: TypingSession = {
+      status: 'finished',
+      startedAt: 0,
+      endedAt: 60000,
+    }
+
+    expect(getElapsedMinutes(session)).toBe(1)
+  })
+
+  it('returns fractions of a minute', () => {
+    const session: TypingSession = {
+      status: 'finished',
+      startedAt: 0,
+      endedAt: 30000,
+    }
+
+    expect(getElapsedMinutes(session)).toBe(0.5)
+  })
+
+  it('returns zero for an idle session', () => {
+    const session = createTypingSession()
+
+    expect(getElapsedMinutes(session)).toBe(0)
+  })
+
+  it('returns zero for a session that has not ended', () => {
+    const session: TypingSession = {
+      status: 'in-progress',
+      startedAt: 1000,
+      endedAt: null,
+    }
+
+    expect(getElapsedMinutes(session)).toBe(0)
+  })
+
+  it('returns zero when the end is before the start', () => {
+    const session: TypingSession = {
+      status: 'finished',
+      startedAt: 2000,
+      endedAt: 1000,
+    }
+
+    expect(getElapsedMinutes(session)).toBe(0)
   })
 })
