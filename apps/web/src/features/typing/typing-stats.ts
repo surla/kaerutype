@@ -8,3 +8,11 @@ export function createTypingStats(): TypingStats {
     totalKeystrokes: 0,
   }
 }
+
+export function getAccuracy(stats: TypingStats): number {
+  const { correctKeystrokes, totalKeystrokes } = stats
+
+  if (totalKeystrokes === 0) return 0
+
+  return (correctKeystrokes / totalKeystrokes) * 100
+}
