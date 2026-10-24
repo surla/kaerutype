@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import type { TypingSession, TypingStats } from './types'
 import { createTypingSession } from './typing-session'
-import { createTypingStats, getAccuracy, getKanaPerMinute, getWordsPerMinute } from './typing-stats'
+import { createTypingState, typeChar } from './typing-state'
+import {
+  createTypingStats,
+  getAccuracy,
+  getKanaPerMinute,
+  getWordsPerMinute,
+  recordKeystroke,
+} from './typing-stats'
 
 describe('createTypingStats', () => {
   it('creates stats with all counts at zero', () => {
@@ -222,5 +229,100 @@ describe('getKanaPerMinute', () => {
     }
 
     expect(getKanaPerMinute(stats, session)).toBe(0)
+  })
+})
+
+describe('recordKeystroke', () => {
+  it('counts a correct key partway through a kana', () => {
+    const before = createTypingState('かき')
+    const after = typeChar(before, 'k')
+
+    expect(recordKeystroke(createTypingStats(), before, after)).toEqual({
+      wordsCompleted: 0,
+      completedKana: 0,
+      correctKeystrokes: 1,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('counts a wrong key as a keystroke but not a correct one', () => {
+    const before = createTypingState('かき')
+    const after = typeChar(before, 'o')
+
+    expect(recordKeystroke(createTypingStats(), before, after)).toEqual({
+      wordsCompleted: 0,
+      completedKana: 0,
+      correctKeystrokes: 0,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('counts a kana when a key finishes it', () => {
+    const before = typeChar(createTypingState('かき'), 'k')
+    const after = typeChar(before, 'a')
+
+    expect(recordKeystroke(createTypingStats(), before, after)).toEqual({
+      wordsCompleted: 0,
+      completedKana: 1,
+      correctKeystrokes: 1,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('counts a word and its last kana when a key finishes the word', () => {
+    let before = createTypingState('かき')
+    for (const char of 'kak') before = typeChar(before, char)
+    const after = typeChar(before, 'i')
+
+    expect(recordKeystroke(createTypingStats(), before, after)).toEqual({
+      wordsCompleted: 1,
+      completedKana: 1,
+      correctKeystrokes: 1,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('adds to the existing counts', () => {
+    const stats: TypingStats = {
+      wordsCompleted: 2,
+      completedKana: 5,
+      correctKeystrokes: 9,
+      totalKeystrokes: 10,
+    }
+    const before = typeChar(createTypingState('か'), 'k')
+    const after = typeChar(before, 'a')
+
+    expect(recordKeystroke(stats, before, after)).toEqual({
+      wordsCompleted: 3,
+      completedKana: 6,
+      correctKeystrokes: 10,
+      totalKeystrokes: 11,
+    })
+  })
+
+  it('ignores keys after the word is complete', () => {
+    let before = createTypingState('か')
+    for (const char of 'ka') before = typeChar(before, char)
+    const after = typeChar(before, 'x')
+
+    const stats: TypingStats = {
+      ...createTypingStats(),
+      wordsCompleted: 1,
+      completedKana: 1,
+      correctKeystrokes: 2,
+      totalKeystrokes: 2,
+    }
+
+    expect(recordKeystroke(stats, before, after)).toBe(stats)
+  })
+
+  it('does not mutate the original stats', () => {
+    const stats = createTypingStats()
+    const before = createTypingState('かき')
+    const after = typeChar(before, 'k')
+
+    recordKeystroke(stats, before, after)
+
+    expect(stats).toEqual(createTypingStats())
   })
 })
