@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import type { Word } from './types'
 import { createTypingSession } from './typing-session'
 import { createTypingState, isWordComplete } from './typing-state'
+import { createTypingStats } from './typing-stats'
 import { useTypingStore } from './typing-store'
 
 const WORD = 'こんにちは'
@@ -21,6 +22,7 @@ describe('useTypingStore', () => {
       queue: { words: [makeWord(WORD)], index: 0 },
       wordState: null,
       session: createTypingSession(),
+      stats: createTypingStats(),
     })
   })
 
@@ -231,5 +233,67 @@ describe('useTypingStore', () => {
       startedAt: 4000,
       endedAt: null,
     })
+  })
+
+  it('counts a correct keystroke', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().stats).toEqual({
+      wordsCompleted: 0,
+      completedKana: 0,
+      correctKeystrokes: 1,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('counts a wrong keystroke without counting it as correct', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('z', 1000)
+
+    expect(useTypingStore.getState().stats).toEqual({
+      wordsCompleted: 0,
+      completedKana: 0,
+      correctKeystrokes: 0,
+      totalKeystrokes: 1,
+    })
+  })
+
+  it('counts a completed word', () => {
+    useTypingStore.getState().start()
+    for (const char of WORD_ROMAJI) {
+      useTypingStore.getState().type(char, 1000)
+    }
+
+    expect(useTypingStore.getState().stats).toEqual({
+      wordsCompleted: 1,
+      completedKana: 5,
+      correctKeystrokes: 11,
+      totalKeystrokes: 11,
+    })
+  })
+
+  it('does not count keys typed before start', () => {
+    useTypingStore.getState().type('k', 1000)
+
+    expect(useTypingStore.getState().stats).toEqual(createTypingStats())
+  })
+
+  it('does not count keys typed after the session finishes', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+    useTypingStore.getState().finishSession(2000)
+    useTypingStore.getState().type('o', 3000)
+
+    expect(useTypingStore.getState().stats.totalKeystrokes).toBe(1)
+  })
+
+  it('resets the stats on restart', () => {
+    useTypingStore.getState().start()
+    useTypingStore.getState().type('k', 1000)
+
+    useTypingStore.getState().restart()
+
+    expect(useTypingStore.getState().stats).toEqual(createTypingStats())
   })
 })

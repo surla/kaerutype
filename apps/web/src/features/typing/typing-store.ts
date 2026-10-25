@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { TypingSession, TypingState, WordQueue } from './types'
+import type { TypingSession, TypingState, TypingStats, WordQueue } from './types'
 import {
   createTypingSession,
   finishTypingSession,
@@ -8,6 +8,7 @@ import {
   startTypingSession,
 } from './typing-session'
 import { backspace, createTypingState, typeChar } from './typing-state'
+import { createTypingStats, recordKeystroke } from './typing-stats'
 import { advanceQueue, createWordQueue, getCurrentWord } from './word-queue'
 import { words } from './words'
 
@@ -15,6 +16,7 @@ type TypingStore = {
   queue: WordQueue
   wordState: TypingState | null
   session: TypingSession
+  stats: TypingStats
 
   start: () => void
   nextWord: () => void
@@ -32,6 +34,7 @@ export const useTypingStore = create<TypingStore>()((set) => ({
   queue: createWordQueue(words),
   wordState: null,
   session: createTypingSession(),
+  stats: createTypingStats(),
 
   start: () =>
     set((state) => {
@@ -58,9 +61,13 @@ export const useTypingStore = create<TypingStore>()((set) => ({
       if (!state.wordState) return state
       if (state.session.status === 'finished') return state
 
+      const previous = state.wordState
+      const next = typeChar(state.wordState, char)
+
       return {
-        wordState: typeChar(state.wordState, char),
+        wordState: next,
         session: startTypingSession(state.session, now),
+        stats: recordKeystroke(state.stats, previous, next),
       }
     }),
 
@@ -95,6 +102,7 @@ export const useTypingStore = create<TypingStore>()((set) => ({
         queue,
         wordState: currentWord ? createTypingState(currentWord.reading) : null,
         session: resetTypingSession(),
+        stats: createTypingStats(),
       }
     }),
 }))

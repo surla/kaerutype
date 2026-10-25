@@ -30,3 +30,10 @@ export type TypingSession = {
   startedAt: number | null
   endedAt: number | null
 }
+
+export type TypingStats = {
+  wordsCompleted: number
+  completedKana: number
+  correctKeystrokes: number
+  totalKeystrokes: number
+}
