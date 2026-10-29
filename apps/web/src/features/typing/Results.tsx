@@ -1,4 +1,4 @@
-import { FEEDBACK_URL } from '../../constants'
+import { FEEDBACK_URL } from '../../lib/constants'
 import { formatResults } from './format-results'
 import { useTypingStore } from './typing-store'
 
