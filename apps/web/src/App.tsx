@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 
 import { Layout } from './components/layout'
-import { Results } from './features/typing/Results'
-import { Timer } from './features/typing/Timer'
+import { Results } from './features/typing/results'
+import { Timer } from './features/typing/timer'
 import { TypingField } from './features/typing/typing-field'
 import { WordDisplay } from './features/typing/word-display'
 
