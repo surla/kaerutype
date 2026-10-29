@@ -24,9 +24,12 @@ describe('kanaTable', () => {
     expect(kanaTable['ゃ']).toEqual(['xya', 'lya'])
   })
 
-  it('types ぢ and づ as di and du', () => {
+  it('types ぢ as di', () => {
     expect(kanaTable['ぢ']).toEqual(['di'])
-    expect(kanaTable['づ']).toEqual(['du'])
+  })
+
+  it('accepts both du and zu for づ', () => {
+    expect(kanaTable['づ']).toEqual(['du', 'zu'])
   })
 
   it('has ん with n and nn as its default inputs', () => {
