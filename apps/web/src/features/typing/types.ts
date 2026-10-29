@@ -38,3 +38,10 @@ export type TypingStats = {
   correctKeystrokes: number
   totalKeystrokes: number
 }
+
+export type ResultsSummary = {
+  wordsPerMinute: string
+  kanaPerMinute: string
+  accuracy: string
+  wordsCompleted: string
+}
