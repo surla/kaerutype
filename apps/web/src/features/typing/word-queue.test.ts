@@ -4,8 +4,8 @@ import type { Word } from './types'
 import { advanceQueue, createWordQueue, getCurrentWord } from './word-queue'
 
 const words: Word[] = [
-  { id: '1', word: '学校', reading: 'がっこう', meaning: 'school' },
-  { id: '2', word: '切符', reading: 'きっぷ', meaning: 'ticket' },
+  { id: 1, word: '学校', reading: 'がっこう', romaji: 'gakkou', meaning: 'school' },
+  { id: 2, word: '切符', reading: 'きっぷ', romaji: 'kippu', meaning: 'ticket' },
 ]
 
 describe('createWordQueue', () => {

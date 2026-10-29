@@ -9,10 +9,13 @@ import { useTypingStore } from './typing-store'
 const WORD = 'こんにちは'
 const WORD_ROMAJI = 'konnnichiha'
 
+let nextId = 1
+
 const makeWord = (reading: string): Word => ({
-  id: reading,
+  id: nextId++,
   word: reading,
   reading,
+  romaji: reading,
   meaning: reading,
 })
 
