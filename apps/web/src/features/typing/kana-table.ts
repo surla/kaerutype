@@ -79,7 +79,7 @@ export const kanaTable: KanaTable = {
 
   // ぢ and づ use distinct IME inputs.
   ぢ: ['di'],
-  づ: ['du'],
+  づ: ['du', 'zu'],
 
   で: ['de'],
   ど: ['do'],
