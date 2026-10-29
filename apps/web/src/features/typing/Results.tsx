@@ -1,3 +1,4 @@
+import { FEEDBACK_URL } from '../../constants'
 import { formatResults } from './format-results'
 import { useTypingStore } from './typing-store'
 
@@ -35,6 +36,15 @@ export function Results() {
       >
         Play again
       </button>
+
+      <a
+        href={FEEDBACK_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-6 text-sm text-slate-500 hover:text-slate-700 hover:underline"
+      >
+        Help improve KaeruType <span aria-hidden="true">↗</span>
+      </a>
     </main>
   )
 }
