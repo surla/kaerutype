@@ -13,14 +13,18 @@ export function WordDisplay({ text }: WordDisplayProps) {
   const isComplete = isWordComplete(wordState)
 
   return (
-    <div className="text-center">
-      <p className={`text-5xl ${isComplete ? 'text-green-500' : 'text-neutral-700'}`}>{text}</p>
-      <p className="text-xl">
+    <div className="flex flex-col items-center gap-4 text-center">
+      <p
+        className={`text-6xl font-semibold sm:text-7xl ${isComplete ? 'text-green-500' : 'text-slate-900'}`}
+      >
+        {text}
+      </p>
+      <p className="text-3xl sm:text-4xl">
         {wordState.kanaUnits.map((unit, index) => {
           return (
             <span
               key={index}
-              className={index < wordState.index ? 'text-green-500' : 'text-neutral-400'}
+              className={index < wordState.index ? 'text-green-500' : 'text-slate-500'}
             >
               {unit.kana}
             </span>
