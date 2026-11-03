@@ -1,19 +1,18 @@
-import { useEffect } from 'react'
+import { Routes, Route } from 'react-router'
 
 import { Layout } from './components/layout'
-import { Results } from './features/typing/results'
-import { TypingGame } from './features/typing/typing-game'
-import { useTypingStore } from './features/typing/typing-store'
+import { HomePage } from './pages/home-page'
+import { NotFoundPage } from './pages/not-found-page'
 
 function App() {
-  const start = useTypingStore((state) => state.start)
-  const status = useTypingStore((state) => state.session.status)
-
-  useEffect(() => {
-    start()
-  }, [start])
-
-  return <Layout> {status === 'finished' ? <Results /> : <TypingGame />}</Layout>
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Layout>
+  )
 }
 
 export default App
