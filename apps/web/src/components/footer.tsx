@@ -18,7 +18,7 @@ export function Footer() {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={analytics.feedbackClicked}
+            onClick={link.label === 'Feedback' ? analytics.feedbackClicked : undefined}
             className="hover:text-slate-700 hover:underline"
           >
             {link.label}
