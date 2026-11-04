@@ -1,4 +1,6 @@
 import { FEEDBACK_URL } from '../../lib/constants'
+import { analytics } from '../../lib/analytics'
+
 import { formatResults } from './format-results'
 import { useTypingStore } from './typing-store'
 
@@ -41,6 +43,7 @@ export function Results() {
         href={FEEDBACK_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={analytics.feedbackClicked}
         className="mt-6 text-sm text-slate-500 hover:text-slate-700 hover:underline"
       >
         Help improve KaeruType <span aria-hidden="true">↗</span>

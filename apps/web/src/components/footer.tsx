@@ -1,4 +1,5 @@
 import { FEEDBACK_URL } from '../lib/constants'
+import { analytics } from '../lib/analytics'
 
 const footerLinks = [
   { label: 'How it works', href: '/how-it-works' },
@@ -17,6 +18,7 @@ export function Footer() {
             href={link.href}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={analytics.feedbackClicked}
             className="hover:text-slate-700 hover:underline"
           >
             {link.label}

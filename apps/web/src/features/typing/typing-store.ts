@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+import { analytics } from '../../lib/analytics'
+
 import type { TypingSession, TypingState, TypingStats, WordQueue } from './types'
 import {
   createTypingSession,
@@ -61,6 +63,12 @@ export const useTypingStore = create<TypingStore>()((set) => ({
       if (!state.wordState) return state
       if (state.session.status === 'finished') return state
 
+      const isNewSession = state.session.status === 'idle'
+
+      if (isNewSession) {
+        analytics.sessionStarted()
+      }
+
       const previous = state.wordState
       const next = typeChar(state.wordState, char)
 
@@ -86,14 +94,25 @@ export const useTypingStore = create<TypingStore>()((set) => ({
       session: startTypingSession(state.session, now),
     })),
 
-  finishSession: (now) =>
-    set((state) => ({
-      session: finishTypingSession(state.session, now),
-    })),
+  finishSession: (now) => {
+    set((state) => {
+      const wasActive = state.session.status !== 'idle' && state.session.status !== 'finished'
+
+      const session = finishTypingSession(state.session, now)
+
+      if (wasActive && session.status === 'finished') {
+        analytics.sessionCompleted()
+      }
+
+      return { session }
+    })
+  },
 
   resetSession: () => set({ session: resetTypingSession() }),
 
-  restart: () =>
+  restart: () => {
+    analytics.sessionRestarted()
+
     set((state) => {
       const queue = createWordQueue(state.queue.words)
       const currentWord = getCurrentWord(queue)
@@ -104,5 +123,6 @@ export const useTypingStore = create<TypingStore>()((set) => ({
         session: resetTypingSession(),
         stats: createTypingStats(),
       }
-    }),
+    })
+  },
 }))
