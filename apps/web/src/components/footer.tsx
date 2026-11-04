@@ -1,7 +1,7 @@
 import { FEEDBACK_URL } from '../lib/constants'
 
 const footerLinks = [
-  { label: 'How it works', href: 'https://github.com/surla/kaerutype#readme' },
+  { label: 'How it works', href: '/how-it-works' },
   { label: 'Privacy Policy', href: '/privacy-policy' },
   { label: 'Feedback', href: FEEDBACK_URL },
 ]
