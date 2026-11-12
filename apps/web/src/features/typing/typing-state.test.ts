@@ -19,6 +19,10 @@ describe('createTypingState', () => {
       { kana: 'う', acceptedInputs: ['u'] },
     ])
   })
+
+  it('starts with no locked inputs', () => {
+    expect(createTypingState('ありがとう').lockedInputs).toEqual([])
+  })
 })
 
 describe('matchBuffer', () => {
@@ -119,6 +123,20 @@ describe('typeChar', () => {
       expect(final.buffer).toBe('')
     })
   })
+
+  it('locks the typed romaji when a kana is completed', () => {
+    const state = { ...createTypingState('すし'), buffer: 's' }
+    const result = typeChar(state, 'u')
+    expect(result.lockedInputs).toEqual(['su'])
+  })
+
+  it('locks the short form of ん when a consonant follows', () => {
+    let state = createTypingState('かんき')
+    for (const char of 'kank') state = typeChar(state, char)
+
+    expect(state.lockedInputs).toEqual(['ka', 'n'])
+    expect(state.buffer).toBe('k')
+  })
 })
 
 describe('backspace', () => {
@@ -158,6 +176,13 @@ describe('backspace', () => {
 
     expect(isWordComplete(state)).toBe(true)
     expect(typeChar(state, 'k')).toEqual(state)
+  })
+
+  it('does not change locked inputs on backspace', () => {
+    const state = { ...createTypingState('すし'), buffer: 's' }
+    const afterSu = typeChar(state, 'u')
+    const result = backspace(afterSu)
+    expect(result.lockedInputs).toEqual(['su'])
   })
 })
 

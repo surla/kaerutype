@@ -9,6 +9,7 @@ export type TypingState = {
   kanaUnits: KanaUnit[]
   index: number
   buffer: string
+  lockedInputs: string[]
 }
 
 export type BufferMatch = 'complete' | 'partial' | 'invalid'
