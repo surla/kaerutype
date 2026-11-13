@@ -25,14 +25,13 @@ export function TypingGame() {
   }, [wordState, nextWord])
 
   return (
-    <div className="flex w-full max-w-2xl flex-col items-center">
+    <div className="flex flex-col items-center gap-10">
       <Timer />
 
-      <div className="mt-16 mb-12">
+      <div className="flex w-full flex-col items-center gap-2">
         <WordDisplay text={currentWord?.word ?? ''} />
+        <TypingField />
       </div>
-
-      <TypingField />
     </div>
   )
 }

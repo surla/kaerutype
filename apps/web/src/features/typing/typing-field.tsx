@@ -18,9 +18,9 @@ export function TypingField() {
       <div
         role="status"
         aria-label="Typing progress"
-        className={`flex min-h-20 w-full max-w-lg items-center justify-center rounded-4xl border bg-white px-6 text-2xl shadow-sm transition-colors duration-150 sm:min-h-24 ${isComplete ? 'border-green-500' : 'border-slate-200'}`}
+        className={'flex min-h-16 w-full items-center justify-center px-6'}
       >
-        <div className="flex min-w-0 items-center">
+        <div className="flex min-w-0 items-center font-mono text-3xl tracking-wide sm:text-4xl">
           <span className="text-green-500">{lockedRomaji}</span>
           <span className="text-neutral-500">{wordState.buffer}</span>
 
@@ -31,7 +31,9 @@ export function TypingField() {
             />
           )}
 
-          {isEmpty && <span className="ml-3 text-slate-400">Type in romaji...</span>}
+          {isEmpty && (
+            <span className="ml-3 font-sans text-xl text-slate-400">Type in romaji...</span>
+          )}
         </div>
       </div>
 
