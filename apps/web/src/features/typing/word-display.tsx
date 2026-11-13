@@ -13,9 +13,9 @@ export function WordDisplay({ text }: WordDisplayProps) {
   const isComplete = isWordComplete(wordState)
 
   return (
-    <div className="flex flex-col items-center gap-4 text-center">
+    <div className="flex flex-col items-center gap-7 text-center">
       <p
-        className={`text-6xl font-semibold sm:text-7xl ${isComplete ? 'text-green-500' : 'text-slate-900'}`}
+        className={`text-7xl font-semibold sm:text-8xl ${isComplete ? 'text-green-500' : 'text-slate-900'}`}
       >
         {text}
       </p>

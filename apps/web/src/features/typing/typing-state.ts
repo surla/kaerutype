@@ -8,6 +8,7 @@ export function createTypingState(word: string): TypingState {
     kanaUnits,
     index: 0,
     buffer: '',
+    lockedInputs: [],
   }
 }
 
@@ -24,7 +25,7 @@ export function matchBuffer(unit: KanaUnit, buffer: string): BufferMatch {
 }
 
 export function typeChar(state: TypingState, char: string): TypingState {
-  const { kanaUnits, index, buffer } = state
+  const { kanaUnits, index, buffer, lockedInputs } = state
   const currentUnit = kanaUnits[index]
   if (!currentUnit) return state
 
@@ -36,6 +37,7 @@ export function typeChar(state: TypingState, char: string): TypingState {
       ...state,
       index: index + 1,
       buffer: char,
+      lockedInputs: [...lockedInputs, buffer],
     }
   }
 
@@ -48,6 +50,7 @@ export function typeChar(state: TypingState, char: string): TypingState {
       ...state,
       index: index + 1,
       buffer: '',
+      lockedInputs: [...lockedInputs, newBuffer],
     }
   }
 
